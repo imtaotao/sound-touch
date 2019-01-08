@@ -1,5 +1,5 @@
 # 说明
-音频时间拉伸和音高变换库。基于 [SoundTouch](ttp://www.surina.net/soundtouch) 的 C++ 实现，他的 js 实现最早由 [Ryan Berdeen](https://github.com/also/soundtouch-js) 实现，此处重新封装为 es module，用于满足 [hearken](https://github.com/imtaotao/hearken) 的功能需求
+音频时间拉伸和音高变换库。基于 [SoundTouch](http://www.surina.net/soundtouch) 的 C++ 实现，他的 js 实现最早由 [Ryan Berdeen](https://github.com/also/soundtouch-js) 实现，此处重新封装为 es module，用于满足 [hearken](https://github.com/imtaotao/hearken) 的功能需求
 
 # 为何要用到
 原生 webaudio 的速率与音高混合在一起，[暂时](https://github.com/WebAudio/web-audio-api/issues/723)没有办法分离，对于需要这方面功能的需求，可以用此库解决
