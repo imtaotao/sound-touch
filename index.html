@@ -1,67 +1,62 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>soundtouch.js demo</title>
-	<style>
-		body {
-			line-height: 30px;
-		}
-		input, button {
-			display: block;
-		}
-	</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>soundtouch.js demo</title>
 </head>
 <body>
-	<button onclick="play()">Play</button>
-	<button onclick="pause()">Pause</button>
-	tempo: <input type="range" autofocus="true" min="0.1" max="4.0" name="tempoSlider" defaultValue="1.0" id="tempoSlider" step="0.01">
-	pitch: <input type="range" autofocus="true" min="0.1" max="2.0" name="pitchSlider" defaultValue="1.0" id="pitchSlider" step="0.01">
-	rate: <input type="range" autofocus="true" min="0.1" max="2.0" name="pitchSlider" defaultValue="1.0" id="rateSlider" step="0.01">
+  <button onclick="play()">Play</button>
+  <button onclick="pause()">Pause</button>
+  tempo: <input type="range" autofocus="true" min="0.1" max="4.0" name="tempoSlider" defaultValue="1.0" id="tempoSlider" step="0.01">
+  pitch: <input type="range" autofocus="true" min="0.1" max="2.0" name="pitchSlider" defaultValue="1.0" id="pitchSlider" step="0.01">
+  rate: <input type="range" autofocus="true" min="0.1" max="2.0" name="pitchSlider" defaultValue="1.0" id="rateSlider" step="0.01">
 </body>
 <script type="module">
-	import PitchShifter from './src/index.js'
+  import PitchShifter from './src/index.js'
 
-	const context = window.ac = new AudioContext()
-	let pitchshifter
+  const context = window.ac = new AudioContext()
+  let pitchshifter
 
-	// get audio
-	const xhr = new XMLHttpRequest()
-	xhr.open('GET', './盲点.mp3', true)
-	xhr.responseType = 'arraybuffer'
-	xhr.send()
-	xhr.onload = function () {
-		context.decodeAudioData(xhr.response, buffer => {
-			console.log('decoded')
-			window.p = pitchshifter = new PitchShifter(context, buffer, 1024)
-			pitchshifter.tempo = 1
-		})
-	}
+  // get audio
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', './盲点.mp3', true)
+  xhr.responseType = 'arraybuffer'
+  xhr.send()
+  xhr.onload = function () {
+    context.decodeAudioData(xhr.response, buffer => {
+      console.log('decoded')
+      window.p = pitchshifter = new PitchShifter(context, buffer, 1024)
+      pitchshifter.tempo = 1
+    })
+  }
 
-	window.play = () => {
-		if (context.state === 'suspended') {
-			context.resume().then(() => {
-				pitchshifter.connect(context.destination)
-			})
-		} else {
-			pitchshifter.connect(context.destination)
-		}
-		console.log("play")
-	}
+  window.play = () => {
+    if (context.state === 'suspended') {
+      context.resume().then(() => {
+        pitchshifter.connect(context.destination)
+      })
+    } else {
+      pitchshifter.connect(context.destination)
+    }
+    console.log("play")
+  }
 
-	window.pause = () => {
-		pitchshifter.disconnect()
-	}
+  window.pause = () => {
+    pitchshifter.disconnect()
+  }
 
-	document.getElementById('tempoSlider').oninput = function () {
-		pitchshifter.tempo = this.value
-	}
+  document.getElementById('tempoSlider').oninput = function () {
+    pitchshifter.tempo = this.value
+  }
 
-	document.getElementById('pitchSlider').oninput = function () {
-		pitchshifter.pitch = this.value
-	}
+  document.getElementById('pitchSlider').oninput = function () {
+    pitchshifter.pitch = this.value
+  }
 
-	document.getElementById('rateSlider').oninput = function () {
-		pitchshifter.rate = this.value
-	}
+  document.getElementById('rateSlider').oninput = function () {
+    pitchshifter.rate = this.value
+  }
 </script>
 </html>
