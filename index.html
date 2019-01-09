@@ -22,7 +22,7 @@
   import PitchShifter from './src/index.js'
 
   const context = window.ac = new AudioContext()
-  let pitchshifter
+  let gainNode, pitchshifter, bufferSource
 
   // get audio
   const xhr = new XMLHttpRequest()
@@ -32,18 +32,30 @@
   xhr.onload = function () {
     context.decodeAudioData(xhr.response, buffer => {
       console.log('decoded')
-      window.p = pitchshifter = new PitchShifter(context, buffer, 1024)
-      pitchshifter.tempo = 1
+      bufferSource = context.createBufferSource()
+      gainNode = context.createGain()
+      // pitchshifter = new PitchShifter(context, buffer, 4096)
+      pitchshifter = new PitchShifter(context, bufferSource)
+
+      bufferSource.buffer = buffer
+      bufferSource.connect(pitchshifter._node)
+      pitchshifter.connect(gainNode)
+      gainNode.connect(context.destination)
+
+      window.bf = bufferSource
+      window.gn = gainNode
+      window.p = pitchshifter
     })
   }
 
   window.play = () => {
     if (context.state === 'suspended') {
       context.resume().then(() => {
-        pitchshifter.connect(context.destination)
+        // pitchshifter.connect(context.destination)
+        bufferSource.start()
       })
     } else {
-      pitchshifter.connect(context.destination)
+      // pitchshifter.connect(context.destination)
     }
     console.log("play")
   }

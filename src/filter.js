@@ -45,30 +45,31 @@ export default class SimpleFilter {
     this._sourcePosition = sourcePosition
   }
 
-  fillInputBuffer (numFrames) {
+  fillInputBuffer (originSamples, numFrames) {
     const samples = new Float32Array(numFrames * 2)
-    const numFramesExtracted = this.sourceSound.extract(samples, numFrames, this._sourcePosition)
+    const numFramesExtracted = this.sourceSound.extract(originSamples, samples, numFrames, this._sourcePosition)
     this._sourcePosition += numFramesExtracted
     this.inputBuffer.putSamples(samples, 0, numFramesExtracted)
   }
 
-  fillOutputBuffer (numFrames) {
+  fillOutputBuffer (originSamples, numFrames) {
     while (this.outputBuffer.frameCount < numFrames) {
       // TODO hardcoded buffer size
-      const numInputFrames = (8192 * 2) - this.inputBuffer.frameCount
-
-      this.fillInputBuffer(numInputFrames)
-
-      if (this.inputBuffer.frameCount < (8192 * 2)) {
-        break
+      const size = 8192 * 2
+      // const size = originSamples[0].length * 2
+      const numInputFrames = size - this.inputBuffer.frameCount
+      this.fillInputBuffer(originSamples, numInputFrames)
+      
+      if (this.inputBuffer.frameCount < size) {
+        // break
         // TODO flush pipe
       }
       this._pipe.process()
     }
   }
 
-  extract (target, numFrames) {
-    this.fillOutputBuffer(this.outputBufferPosition + numFrames)
+  extract (originSamples, target, numFrames) {
+    this.fillOutputBuffer(originSamples, this.outputBufferPosition + numFrames)
 
     const numFramesExtracted = Math.min(numFrames, this.outputBuffer.frameCount - this.outputBufferPosition)
     this.outputBuffer.extract(target, this.outputBufferPosition, numFramesExtracted)
