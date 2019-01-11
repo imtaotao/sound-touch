@@ -28,16 +28,17 @@ function getWebAudioNode (context, filter, bufSize) {
     ? context.createScriptProcessor(BUFFER_SIZE, 2, 2)
     : context.createJavascriptNode(BUFFER_SIZE, 2, 2)
   
-  const samples = new Float32Array(BUFFER_SIZE * 2)
+ 
 
   node.onaudioprocess = function (e) {
     const inputLeft = e.inputBuffer.getChannelData(0)
     const inputRight = e.inputBuffer.getChannelData(1)
     const outputLeft = e.outputBuffer.getChannelData(0)
     const outputRight = e.outputBuffer.getChannelData(1)
-
+    const samples = new Float32Array(BUFFER_SIZE * 2)
+    // console.time('record:');
     const framesExtracted = filter.extract([inputLeft, inputRight], samples, BUFFER_SIZE)
-
+    // const framesExtracted = 8192
     if (framesExtracted === 0) {
       node.disconnect() // Pause.
     }
@@ -48,6 +49,8 @@ function getWebAudioNode (context, filter, bufSize) {
       outputRight[i] = samples[i * 2 + 1]
       // outputRight[i] = inputRight[i]
     }
+    
+    // console.timeEnd('record:');
   }
   return node
 }
@@ -55,23 +58,35 @@ function getWebAudioNode (context, filter, bufSize) {
 function extendBufferSouce (sourceSound) {
   sourceSound.extract = function (originSamples, target, numFrames, position) {
     const l = this.buffer.getChannelData(0)
-    // const l = originSamples[0]
     let r
     if (this.buffer.numberOfChannels > 1) {
       r = this.buffer.getChannelData(1)
-      // r = originSamples[1]
     }
     for (let i = 0; i < numFrames; i++) {
       target[i * 2] = l[i + position]
-      // target[i * 2] = l[i]
       if (this.buffer.numberOfChannels > 1) {
         target[i * 2 + 1] = r[i + position]
-        // target[i * 2 + 1] = r[i]
       }
     }
-    // console.log(numFrames, l.length - position);
-    return Math.min(numFrames, l.length - position)
-    // return numFrames / 2
+    const ru = Math.min(numFrames, l.length - position)
+    // console.log(numFrames);
+    return ru
+  }
+
+  sourceSound.extract = function (originSamples, target, numFrames, position) {
+    const l = originSamples[0]
+    let r
+    if (this.buffer.numberOfChannels > 1) {
+      r = originSamples[1]
+    }
+    for (let i = 0; i < numFrames; i++) {
+      target[i * 2] = l[i]
+      if (this.buffer.numberOfChannels > 1) {
+        target[i * 2 + 1] = r[i]
+      }
+    }
+
+    return numFrames
   }
 
   return sourceSound

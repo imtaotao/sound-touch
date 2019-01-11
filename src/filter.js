@@ -55,13 +55,13 @@ export default class SimpleFilter {
   fillOutputBuffer (originSamples, numFrames) {
     while (this.outputBuffer.frameCount < numFrames) {
       // TODO hardcoded buffer size
-      const size = 8192 * 2
-      // const size = originSamples[0].length * 2
+      // const size = 8192 * 2
+      const size = originSamples[0].length * 2
       const numInputFrames = size - this.inputBuffer.frameCount
       this.fillInputBuffer(originSamples, numInputFrames)
       
       if (this.inputBuffer.frameCount < size) {
-        // break
+        break
         // TODO flush pipe
       }
       this._pipe.process()
@@ -75,7 +75,7 @@ export default class SimpleFilter {
     this.outputBuffer.extract(target, this.outputBufferPosition, numFramesExtracted)
 
     const currentFrames = this.outputBufferPosition + numFramesExtracted
-    this.outputBufferPosition = Math.min(this.historyBufferSize, currentFrames)
+    this.outputBufferPosition = Math.min(this.historyBufferSizehistoryBufferSize, currentFrames)
     this.outputBuffer.receive(Math.max(currentFrames - this.historyBufferSize, 0))
 
     this._position += numFramesExtracted

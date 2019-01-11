@@ -35,9 +35,10 @@
       bufferSource = context.createBufferSource()
       gainNode = context.createGain()
       // pitchshifter = new PitchShifter(context, buffer, 4096)
-      pitchshifter = new PitchShifter(context, bufferSource)
+      pitchshifter = new PitchShifter(context, bufferSource, 8192)
 
       bufferSource.buffer = buffer
+      bufferSource.loop = true
       bufferSource.connect(pitchshifter._node)
       pitchshifter.connect(gainNode)
       gainNode.connect(context.destination)
